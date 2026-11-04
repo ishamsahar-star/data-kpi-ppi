@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard IEEP — JKE POLIMAS 2024–2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f4f8;
+      color: #1a2b3c;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: linear-gradient(135deg, #0d2b4e 0%, #1a3a5c 60%, #1e4d7b 100%);
+      color: #fff;
+      padding: 0;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 24px 16px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .header-logo {
+      width: 64px;
+      height: 64px;
+      background: #f0a500;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .header-text h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .header-text h2 {
+      font-size: 13px;
+      font-weight: 400;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+    .header-badge {
+      margin-left: auto;
+      background: rgba(240,165,0,0.2);
+      border: 1px solid #f0a500;
+      color: #f0a500;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .header-nav {
+      background: #0d2b4e;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      gap: 0;
+    }
+    .nav-inner a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      padding: 10px 16px;
+      font-size: 13px;
+      transition: color 0.2s, border-bottom 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+    .nav-inner a:hover {
+      color: #fff;
+      border-bottom-color: #f0a500;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0d2b4e;
+      margin-bottom: 14px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #f0a500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title .icon { font-size: 18px; }
+
+    /* ── KPI CARDS ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 500px) { .kpi-grid { grid-template-columns: 1fr; } }
+
+    .kpi-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 18px 20px;
+      border-left: 4px solid #1a3a5c;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .kpi-card.gold  { border-left-color: #f0a500; }
+    .kpi-card.green { border-left-color: #1a8a4a; }
+    .kpi-card.red   { border-left-color: #c0392b; }
+    .kpi-icon {
+      font-size: 26px;
+      line-height: 1;
+      margin-top: 2px;
+    }
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: #0d2b4e;
+      line-height: 1;
+    }
+    .kpi-label {
+      font-size: 12px;
+      color: #5a7080;
+      margin-top: 4px;
+    }
+    .kpi-sub {
+      font-size: 11px;
+      color: #8a9aaa;
+      margin-top: 2px;
+    }
+
+    /* ── CHARTS GRID ── */
+    .charts-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .charts-3col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) {
+      .charts-2col, .charts-3col { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0d2b4e;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .chart-wrap {
+      position: relative;
+      height: 230px;
+    }
+    .chart-wrap-lg {
+      position: relative;
+      height: 260px;
+    }
+
+    /* ── INDUSTRI BADGES ── */
+    .industry-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .industry-badge {
+      background: #eaf1fb;
+      border: 1px solid #b8d0ea;
+      color: #0d2b4e;
+      padding: 8px 16px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .industry-badge .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #1a3a5c;
+      flex-shrink: 0;
+    }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .filter-bar label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a3a5c;
+    }
+    .filter-bar select,
+    .filter-bar input {
+      border: 1px solid #c8d8e8;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 13px;
+      color: #1a2b3c;
+      background: #fff;
+      outline: none;
+    }
+    .filter-bar select:focus,
+    .filter-bar input:focus {
+      border-color: #1a3a5c;
+    }
+    .filter-bar input { width: 220px; }
+    .result-count {
+      margin-left: auto;
+      font-size: 12px;
+      color: #7a8a9a;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead tr {
+      background: #0d2b4e;
+      color: #fff;
+    }
+    thead th {
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    tbody tr:nth-child(even) { background: #f5f8fc; }
+    tbody tr:hover { background: #e8f0f8; }
+    tbody td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #e8eef4;
+      vertical-align: top;
+    }
+    .tag {
+      display: inline-block;
+      background: #1a3a5c;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      margin: 1px 2px 1px 0;
+    }
+    .tag.det { background: #1a3a5c; }
+    .tag.dep { background: #c0392b; }
+    .tag.dee { background: #1a8a4a; }
+    .year-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .y2024 { background: #1a3a5c; }
+    .y2025 { background: #f0a500; color: #1a2b3c; }
+    .y2026 { background: #1a8a4a; }
+
+    .no-data {
+      text-align: center;
+      padding: 30px;
+      color: #8a9aaa;
+      font-style: italic;
+    }
+
+    /* ── PLO TAG ── */
+    .plo-text {
+      font-size: 11px;
+      color: #5a6a7a;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #0d2b4e;
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      padding: 16px 24px;
+      font-size: 12px;
+      margin-top: 32px;
+    }
+    footer strong { color: #fff; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ HEADER ══════════ -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-logo">🎓</div>
+    <div class="header-text">
+      <h1>Politeknik Sultan Abdul Halim Mu'adzam Shah (POLIMAS)</h1>
+      <h2>Jabatan Kejuruteraan Elektrik — Dashboard KPI Program PPI / IEEP</h2>
+    </div>
+    <div class="header-badge">2024 – 2026</div>
+  </div>
+  <nav class="header-nav">
+    <div class="nav-inner">
+      <a href="#kpi">Statistik KPI</a>
+      <a href="#charts">Carta</a>
+      <a href="#industri">Industri</a>
+      <a href="#aktiviti">Senarai Aktiviti</a>
+    </div>
+  </nav>
+</header>
+
+<!-- ══════════ MAIN ══════════ -->
+<main class="main">
+
+  <!-- ── KPI CARDS ── -->
+  <section id="kpi" style="margin-bottom:28px;">
+    <div class="section-title"><span class="icon">📊</span> Ringkasan KPI IEEP 2024–2026</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon">📋</div>
+        <div>
+          <div class="kpi-value">27</div>
+          <div class="kpi-label">Jumlah Aktiviti PPI</div>
+          <div class="kpi-sub">2024: 12 &nbsp;|&nbsp; 2025: 10 &nbsp;|&nbsp; 2026: 5</div>
+        </div>
+      </div>
+      <div class="kpi-card gold">
+        <div class="kpi-icon">⏱️</div>
+        <div>
+          <div class="kpi-value">283.5j</div>
+          <div class="kpi-label">Jumlah Jam Terkumpul</div>
+          <div class="kpi-sub">DET: 107.5j &nbsp;|&nbsp; DEP: 81j &nbsp;|&nbsp; DEE: 95j</div>
+        </div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-icon">🏭</div>
+        <div>
+          <div class="kpi-value">7</div>
+          <div class="kpi-label">Industri / Agensi Terlibat</div>
+          <div class="kpi-sub">TNB, Solar, RTM, KTM, BEM/ETAC, dll.</div>
+        </div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-icon">👩‍🎓</div>
+        <div>
+          <div class="kpi-value">1,200+</div>
+          <div class="kpi-label">Anggaran Pelajar Terlibat</div>
+          <div class="kpi-sub">DET, DEP &amp; DEE — Pelbagai Semester</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CHARTS ── -->
+  <section id="charts" style="margin-bottom:28px;">
+    <div class="section-title"><span class="icon">📈</span> Analisis Program Mengikut Tahun</div>
+    <div class="charts-2col">
+      <div class="card">
+        <div class="card-title">Bilangan Aktiviti Mengikut Tahun</div>
+        <div class="chart-wrap"><canvas id="chartAktiviti"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Jumlah Jam Mengikut Program &amp; Tahun</div>
+        <div class="chart-wrap"><canvas id="chartJam"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-2col">
+      <div class="card">
+        <div class="card-title">Jenis Aktiviti 2024–2026</div>
+        <div class="chart-wrap"><canvas id="chartJenis"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Agihan Jam Mengikut Program (Keseluruhan)</div>
+        <div class="chart-wrap"><canvas id="chartJamTotal"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── INDUSTRI ── -->
+  <section id="industri" style="margin-bottom:28px;">
+    <div class="section-title"><span class="icon">🏢</span> Industri &amp; Agensi Terlibat</div>
+    <div class="card">
+      <div class="industry-grid" id="industryBadges"></div>
+    </div>
+  </section>
+
+  <!-- ── JADUAL AKTIVITI ── -->
+  <section id="aktiviti">
+    <div class="section-title"><span class="icon">📝</span> Senarai Lengkap Aktiviti PPI / IEEP</div>
+    <div class="card">
+      <div class="filter-bar">
+        <label for="filterTahun">Tahun:</label>
+        <select id="filterTahun" onchange="renderTable()">
+          <option value="">Semua</option>
+          <option value="2024">2024</option>
+          <option value="2025">2025</option>
+          <option value="2026">2026</option>
+        </select>
+        <label for="filterProgram">Program:</label>
+        <select id="filterProgram" onchange="renderTable()">
+          <option value="">Semua</option>
+          <option value="DET">DET</option>
+          <option value="DEP">DEP</option>
+          <option value="DEE">DEE</option>
+        </select>
+        <label for="searchBox">Carian:</label>
+        <input type="text" id="searchBox" placeholder="Nama aktiviti..." oninput="renderTable()" />
+        <span class="result-count" id="resultCount"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Tahun</th>
+              <th style="min-width:280px;">Aktiviti</th>
+              <th>Program</th>
+              <th>Tarikh</th>
+              <th>Jam</th>
+              <th>PIC</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>
+  <strong>Jabatan Kejuruteraan Elektrik (JKE)</strong> &nbsp;|&nbsp;
+  Politeknik Sultan Abdul Halim Mu'adzam Shah (POLIMAS) &nbsp;|&nbsp;
+  Program PPI / IEEP 2024–2026 &nbsp;|&nbsp;
+  Jana: November 2026
+  <br><span style="opacity:0.5;font-size:11px;margin-top:4px;display:block;">Made with IBM Bob</span>
+</footer>
+
+<!-- ══════════ DATA & SCRIPTS ══════════ -->
+<script>
+// ── DATA AKTIVITI ──────────────────────────────────────────────
+const AKTIVITI = [
+  // 2024
+  { tahun: 2024, bil: 1,  nama: "Lawatan Sambil Belajar Semester 4 JKE Sesi 2 2023/2024 (DEE4A)", program: ["DEE"], tarikh: "24 Apr 2024", jam: { det: 0, dep: 0, dee: 4 }, pic: "Pn Hawa", jenis: "Lawatan" },
+  { tahun: 2024, bil: 2,  nama: "Bengkel Internal Wiring CA1C & External Wiring CA2C Fiber to the Home", program: ["DEP","DEE"], tarikh: "4–5 Mei 2024", jam: { det: 0, dep: 11, dee: 11 }, pic: "Cik Haizilah", jenis: "Kursus/Bengkel" },
+  { tahun: 2024, bil: 3,  nama: "Lawatan Sambil Belajar Semester Akhir JKE Sesi 2 2023/2024 (DET5A/5B)", program: ["DET"], tarikh: "14 Mei 2024", jam: { det: 4, dep: 0, dee: 0 }, pic: "En Walid", jenis: "Lawatan" },
+  { tahun: 2024, bil: 4,  nama: "Lawatan Sambil Belajar Semester 4 JKE Sesi 2 2023/2024 (DEE4B, DEP4A)", program: ["DET","DEP","DEE"], tarikh: "23 Apr 2024", jam: { det: 4, dep: 4, dee: 4 }, pic: "Pn Norain", jenis: "Lawatan" },
+  { tahun: 2024, bil: 5,  nama: "Kursus Route to BEM, Inspector of Works (IOW) / Semakan ETAC (DEE & DEP)", program: ["DEP","DEE"], tarikh: "7 Ogos 2024", jam: { det: 0, dep: 3, dee: 3 }, pic: "Pn Yana", jenis: "Kursus/Bengkel" },
+  { tahun: 2024, bil: 6,  nama: "Kursus Route to BEM, Inspector of Works (IOW) / Semakan ETAC (DET)", program: ["DET"], tarikh: "20 Ogos 2024", jam: { det: 3, dep: 0, dee: 0 }, pic: "Pn Yana", jenis: "Kursus/Bengkel" },
+  { tahun: 2024, bil: 7,  nama: "Kursus Power System Protection", program: ["DET","DEP","DEE"], tarikh: "10 Sep 2024", jam: { det: 5, dep: 5, dee: 5 }, pic: "En Syukur", jenis: "Kursus/Bengkel" },
+  { tahun: 2024, bil: 8,  nama: "TNB University Outreach Program with POLIMAS", program: ["DET","DEP","DEE"], tarikh: "16 Okt 2024", jam: { det: 4, dep: 4, dee: 4 }, pic: "En Syukur", jenis: "Kerjasama Industri" },
+  { tahun: 2024, bil: 9,  nama: "Kursus Vision System AI: HuskyLens (Kamera Artificial Intelligence)", program: ["DET","DEP","DEE"], tarikh: "7 Sep 2024", jam: { det: 6, dep: 6, dee: 6 }, pic: "Pn Nurzaliza", jenis: "Kursus/Bengkel" },
+  { tahun: 2024, bil: 10, nama: "Lawatan Sambil Belajar Semester Akhir JKE Sesi 1 2024/2025 (DET5D)", program: ["DET"], tarikh: "8 Okt 2024", jam: { det: 4, dep: 0, dee: 0 }, pic: "Pn Rosmawati", jenis: "Lawatan" },
+  { tahun: 2024, bil: 11, nama: "Lawatan Sambil Belajar Semester Akhir JKE Sesi 1 2024/2025 (DET5B)", program: ["DET"], tarikh: "21 Okt 2024", jam: { det: 4, dep: 0, dee: 0 }, pic: "Pn Najmeen", jenis: "Lawatan" },
+  { tahun: 2024, bil: 12, nama: "Lawatan Sambil Belajar Semester Akhir JKE Sesi 1 2024/2025 (DET5C) ke HVDC Gurun", program: ["DET"], tarikh: "25 Sep 2024", jam: { det: 3, dep: 0, dee: 0 }, pic: "Pn Erniza", jenis: "Lawatan" },
+  // 2025
+  { tahun: 2025, bil: 1,  nama: "Lawatan Sambil Belajar ke Akademi KTM MYRA (DET5A, DET5B, DEE5B)", program: ["DET","DEE"], tarikh: "4 Feb 2025", jam: { det: 4, dep: 0, dee: 4 }, pic: "Pn Sharita", jenis: "Lawatan" },
+  { tahun: 2025, bil: 2,  nama: "3D Prototype Design with Embedded Technology", program: ["DET","DEP","DEE"], tarikh: "9 Apr 2025", jam: { det: 8, dep: 8, dee: 8 }, pic: "Pn Norliza", jenis: "Kursus/Bengkel" },
+  { tahun: 2025, bil: 3,  nama: "Kursus FTTH — Internal Wiring CA1C & External Wiring CA2C Fiber to the Home", program: ["DET","DEP","DEE"], tarikh: "12–13 Apr 2025", jam: { det: 12, dep: 12, dee: 12 }, pic: "Cik Ila", jenis: "Kursus/Bengkel" },
+  { tahun: 2025, bil: 4,  nama: "Fire Safety and First Aid Awareness 2025 (JKE)", program: ["DET","DEE"], tarikh: "15 Apr 2025", jam: { det: 8, dep: 0, dee: 8 }, pic: "Pn Azniza", jenis: "Keselamatan" },
+  { tahun: 2025, bil: 5,  nama: "Mastering the Final Project Report: A Guide to Excellence", program: ["DET","DEP","DEE"], tarikh: "16 Apr 2025", jam: { det: 4, dep: 4, dee: 4 }, pic: "Pn Fariza", jenis: "Ceramah Industri" },
+  { tahun: 2025, bil: 6,  nama: "Lawatan Sambil Belajar ke RTM Perlis", program: ["DEP","DEE"], tarikh: "26 Ogos 2025", jam: { det: 0, dep: 4, dee: 4 }, pic: "Pn Habsah / Pn Zaliza", jenis: "Lawatan" },
+  { tahun: 2025, bil: 7,  nama: "Lawatan Sambil Belajar ke TNB Janamanjung", program: ["DET"], tarikh: "21 Ogos 2025", jam: { det: 5, dep: 0, dee: 0 }, pic: "Tn Hj Ramli", jenis: "Kerjasama Industri" },
+  { tahun: 2025, bil: 8,  nama: "Lawatan Sambil Belajar ke TNB HVDC", program: ["DET"], tarikh: "19 Ogos 2025", jam: { det: 4, dep: 0, dee: 0 }, pic: "En Siva", jenis: "Kerjasama Industri" },
+  { tahun: 2025, bil: 9,  nama: "Lawatan Sambil Belajar ke Quantum Solar Park Sdn Bhd", program: ["DET"], tarikh: "9 Sep 2025", jam: { det: 4, dep: 0, dee: 0 }, pic: "Pn Fatin", jenis: "Lawatan" },
+  { tahun: 2025, bil: 10, nama: "Pengenalan Relay Perlindungan, Prosedur & Standard Penentukuran", program: ["DET"], tarikh: "2 Okt 2025", jam: { det: 3.5, dep: 0, dee: 0 }, pic: "Pn Seha", jenis: "Kursus/Bengkel" },
+  // 2026
+  { tahun: 2026, bil: 1,  nama: "FYP Excellence: From Ideas to Professional Reports", program: ["DET","DEP","DEE"], tarikh: "4 Jan 2026", jam: { det: 2, dep: 2, dee: 2 }, pic: "Pn Fariza Binti Ishak", jenis: "Ceramah Industri" },
+  { tahun: 2026, bil: 2,  nama: "Vision-Based Embedded Robotic System Using HuskyLens", program: ["DET","DEE"], tarikh: "4 Dis 2026", jam: { det: 5.5, dep: 5.5, dee: 5.5 }, pic: "Pn Anis Binti Pauzi", jenis: "Kursus/Bengkel" },
+  { tahun: 2026, bil: 3,  nama: "Ceramah Industri: DEP40103 Data Communication", program: ["DEP"], tarikh: "4 Dis 2026", jam: { det: 0, dep: 2, dee: 0 }, pic: "Pn Nurzaliza", jenis: "Ceramah Industri" },
+  { tahun: 2026, bil: 4,  nama: "Kursus Empowering Future Engineers: IOW & Entrepreneurship", program: ["DET","DEP","DEE"], tarikh: "2 Sep 2026", jam: { det: 3.5, dep: 3.5, dee: 3.5 }, pic: "Pn Afidah", jenis: "Kursus/Bengkel" },
+  { tahun: 2026, bil: 5,  nama: "Kursus Fiber to Home CA1C", program: ["DET","DEP","DEE"], tarikh: "21 Jul 2026", jam: { det: 7, dep: 7, dee: 7 }, pic: "Cik Khaizilah", jenis: "Kursus/Bengkel" },
+];
+
+const INDUSTRI = [
+  { nama: "TNB (Tenaga Nasional Bhd)", ikon: "⚡" },
+  { nama: "Quantum Solar Park Sdn Bhd", ikon: "☀️" },
+  { nama: "RTM Perlis", ikon: "📡" },
+  { nama: "Akademi KTM MYRA", ikon: "🚂" },
+  { nama: "BEM / ETAC", ikon: "🏛️" },
+  { nama: "University Outreach (TNB)", ikon: "🤝" },
+  { nama: "Industri Fiber Optic (FTTH)", ikon: "🔌" },
+];
+
+// ── CHART: Bilangan Aktiviti ───────────────────────────────────
+new Chart(document.getElementById("chartAktiviti"), {
+  type: "bar",
+  data: {
+    labels: ["2024", "2025", "2026"],
+    datasets: [{
+      label: "Bilangan Aktiviti",
+      data: [12, 10, 5],
+      backgroundColor: ["#1a3a5c", "#f0a500", "#1a8a4a"],
+      borderRadius: 6,
+      barThickness: 50,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, ticks: { stepSize: 2 }, grid: { color: "#eef1f5" } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── CHART: Jam per Program per Tahun ──────────────────────────
+new Chart(document.getElementById("chartJam"), {
+  type: "bar",
+  data: {
+    labels: ["2024", "2025", "2026"],
+    datasets: [
+      { label: "DET", data: [37, 52.5, 18], backgroundColor: "#1a3a5c", borderRadius: 4 },
+      { label: "DEP", data: [33, 28, 20],   backgroundColor: "#c0392b", borderRadius: 4 },
+      { label: "DEE", data: [37, 40, 18],   backgroundColor: "#1a8a4a", borderRadius: 4 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: "top", labels: { boxWidth: 12, font: { size: 11 } } } },
+    scales: {
+      y: { beginAtZero: true, grid: { color: "#eef1f5" }, ticks: { font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 12 } } }
+    }
+  }
+});
+
+// ── CHART: Jenis Aktiviti ──────────────────────────────────────
+new Chart(document.getElementById("chartJenis"), {
+  type: "doughnut",
+  data: {
+    labels: ["Lawatan Sambil Belajar", "Kursus / Bengkel", "Kerjasama Industri", "Ceramah Industri", "Keselamatan"],
+    datasets: [{
+      data: [11, 9, 3, 3, 1],
+      backgroundColor: ["#1a3a5c", "#f0a500", "#1a8a4a", "#8e44ad", "#c0392b"],
+      borderWidth: 2,
+      borderColor: "#fff",
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: "right", labels: { boxWidth: 12, font: { size: 11 }, padding: 10 } }
+    },
+    cutout: "58%"
+  }
+});
+
+// ── CHART: Jam Total per Program ──────────────────────────────
+new Chart(document.getElementById("chartJamTotal"), {
+  type: "bar",
+  data: {
+    labels: ["DET", "DEP", "DEE"],
+    datasets: [{
+      label: "Jumlah Jam",
+      data: [107.5, 81, 95],
+      backgroundColor: ["#1a3a5c", "#c0392b", "#1a8a4a"],
+      borderRadius: 6,
+      barThickness: 60,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, grid: { color: "#eef1f5" } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── INDUSTRI BADGES ───────────────────────────────────────────
+(function() {
+  const container = document.getElementById("industryBadges");
+  INDUSTRI.forEach(i => {
+    const div = document.createElement("div");
+    div.className = "industry-badge";
+    div.innerHTML = `<span>${i.ikon}</span> ${i.nama}`;
+    container.appendChild(div);
+  });
+})();
+
+// ── TABLE ─────────────────────────────────────────────────────
+function renderTable() {
+  const tahun   = document.getElementById("filterTahun").value;
+  const program = document.getElementById("filterProgram").value;
+  const search  = document.getElementById("searchBox").value.toLowerCase().trim();
+
+  const filtered = AKTIVITI.filter(a => {
+    if (tahun   && String(a.tahun) !== tahun) return false;
+    if (program && !a.program.includes(program)) return false;
+    if (search  && !a.nama.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  document.getElementById("resultCount").textContent =
+    `${filtered.length} aktiviti dijumpai`;
+
+  const tbody = document.getElementById("tableBody");
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="no-data">Tiada aktiviti yang sepadan.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((a, idx) => {
+    const progTags = a.program.map(p => `<span class="tag ${p.toLowerCase()}">${p}</span>`).join("");
+    const yearCls  = "y" + a.tahun;
+    const jamStr   = a.program.map(p => {
+      const v = a.jam[p.toLowerCase()];
+      return v > 0 ? `<span class="tag ${p.toLowerCase()}">${p}: ${v}j</span>` : "";
+    }).filter(Boolean).join(" ");
+    return `
+      <tr>
+        <td style="text-align:center;color:#8a9aaa;">${idx + 1}</td>
+        <td><span class="year-badge ${yearCls}">${a.tahun}</span></td>
+        <td>${a.nama}</td>
+        <td>${progTags}</td>
+        <td style="white-space:nowrap;">${a.tarikh}</td>
+        <td>${jamStr}</td>
+        <td style="white-space:nowrap;">${a.pic}</td>
+      </tr>`;
+  }).join("");
+}
+
+renderTable();
+</script>
+</body>
+</html>
